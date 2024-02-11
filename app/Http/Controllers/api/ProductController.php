@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Models\product;
+use App\Models\product; // Fix the casing here
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class productController extends Controller
+class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
+        $products = product::all();
 
         return $products->count() > 0
             ? response()->json(['status' => 200, 'products' => $products], 200)
@@ -27,7 +27,7 @@ class productController extends Controller
             'name' => 'required|string|max:255',
             'tipo' => 'required|string|max:255',
             'quantidade' => 'required|numeric|max:50',
-            'materiais' => 'required|string', // Add this line for the 'materiais' field
+            'materiais' => 'required|string',
             'dimensoes' => 'required|string|max:255',
         ]);
 
@@ -47,7 +47,7 @@ class productController extends Controller
      */
     public function show(string $id)
     {
-        $product = product::find($id);
+        $product = product::find($id); // Fix the casing here
     
         if ($product) {
             return response()->json([
@@ -62,65 +62,63 @@ class productController extends Controller
         }
     }
 
-
     public function update(Request $request, string $id)
-{
-    $product = product::find($id);
+    {
+        $product = product::find($id);
 
-    if (!$product) {
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Resource not found',
+            ], 404);
+        }
+
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'tipo' => 'required|string|max:255',
+            'quantidade' => 'required|numeric|max:50',
+            'materiais' => 'required|string',
+            'dimensoes' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $validator->messages(),
+            ], 422);
+        }
+
+        // Update the resource with actual values from the request
+        $product->update($request->all());
+
         return response()->json([
-            'status' => 404,
-            'message' => 'Resource not found',
-        ], 404);
+            'status' => 200,
+            'message' => 'Resource updated successfully',
+            'product' => $product,
+        ], 200);
     }
 
-    // Validate the request data
-    $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255',
-        'tipo' => 'required|string|max:255',
-        'quantidade' => 'required|numeric|max:50',
-        'materiais' => 'required|string', // Add this line for the 'materiais' field
-        'dimensoes' => 'required|string|max:255',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => 422,
-            'errors' => $validator->messages(),
-        ], 422);
-    }
-
-    // Update the resource with actual values from the request
-    $product->update($request->all());
-
-    return response()->json([
-        'status' => 200,
-        'message' => 'Resource updated successfully',
-        'product' => $product,
-    ], 200);
-}
-        
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-{
-    $product = product::find($id);
+    {
+        $product = product::find($id);
 
-    if (!$product) {
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Resource not found',
+            ], 404);
+        }
+
+        // Delete the resource
+        $product->delete();
+
         return response()->json([
-            'status' => 404,
-            'message' => 'Resource not found',
-        ], 404);
+            'status' => 200,
+            'message' => 'Resource deleted successfully',
+        ], 200);
     }
-
-    // Delete the resource
-    $product->delete();
-
-    return response()->json([
-        'status' => 200,
-        'message' => 'Resource deleted successfully',
-    ], 200);
-}
-
 }
