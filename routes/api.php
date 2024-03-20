@@ -48,6 +48,6 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('logout', [UserAuthController::class, 'logout']);
     Route::post('register', [UserAuthController::class, 'register']);
     Route::match(['post', 'get'], 'login', [UserAuthController::class, 'login'])->name('login');
-
+    
 });
 
